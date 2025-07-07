@@ -59,9 +59,9 @@
 </head>
 <body>
   <div class="container">
-    <h2>Upload File (Max 4MB)</h2>
+    <h2>Upload File (max 4MB)</h2>
     <form id="uploadForm">
-      <input type="file" name="file" id="file" required>
+      <input type="file" id="file" required>
       <br>
       <button type="submit">Upload</button>
     </form>
@@ -76,15 +76,16 @@
       e.preventDefault();
       result.innerHTML = "⏳ Uploading...";
 
-      const fileInput = document.getElementById('file');
+      const file = document.getElementById('file').files[0];
       const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
+      formData.append('file', file);
 
       try {
-        const res = await fetch('https://upload-glitch-backend.glitch.me/upload', {
+        const res = await fetch('/api/upload', {
           method: 'POST',
           body: formData
         });
+
         const data = await res.json();
 
         if (data.url) {
@@ -93,11 +94,10 @@
             <a href="${data.url}" target="_blank">${data.url}</a>
             <a href="${data.url}" download>⬇️ Download File</a>
           `;
-        } else if (data.error) {
-          result.innerHTML = `<span class="error">❌ ${data.error}</span>`;
         } else {
-          result.innerHTML = `<span class="error">❌ Upload gagal</span>`;
+          result.innerHTML = `<span class="error">❌ Upload gagal: ${data.error}</span>`;
         }
+
       } catch (err) {
         result.innerHTML = `<span class="error">❌ Error: ${err.message}</span>`;
       }
