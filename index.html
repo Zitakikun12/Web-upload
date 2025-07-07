@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload File Aman</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    input[type="file"] {
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.5rem 1.2rem;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 1rem;
+    }
+    .result a {
+      display: block;
+      word-break: break-word;
+      color: green;
+      margin-bottom: 0.5rem;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Upload File (Max 4MB)</h2>
+    <form id="uploadForm">
+      <input type="file" name="file" id="file" required>
+      <br>
+      <button type="submit">Upload</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      result.innerHTML = "⏳ Uploading...";
+
+      const fileInput = document.getElementById('file');
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      try {
+        const res = await fetch('https://upload-glitch-backend.glitch.me/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.url) {
+          result.innerHTML = `
+            ✅ Berhasil:<br>
+            <a href="${data.url}" target="_blank">${data.url}</a>
+            <a href="${data.url}" download>⬇️ Download File</a>
+          `;
+        } else if (data.error) {
+          result.innerHTML = `<span class="error">❌ ${data.error}</span>`;
+        } else {
+          result.innerHTML = `<span class="error">❌ Upload gagal</span>`;
+        }
+      } catch (err) {
+        result.innerHTML = `<span class="error">❌ Error: ${err.message}</span>`;
+      }
+    });
+  </script>
+</body>
+</html>
