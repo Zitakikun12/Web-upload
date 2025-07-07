@@ -11,14 +11,14 @@ export default async function handler(req, res) {
 
   try {
     const boundary = req.headers['content-type'].split('boundary=')[1];
-    const body = req;
 
     const response = await fetch('https://0x0.st', {
       method: 'POST',
       headers: {
         'Content-Type': `multipart/form-data; boundary=${boundary}`
       },
-      body: body
+      body: req,
+      duplex: 'half' // ⬅️ WAJIB agar tidak error!
     });
 
     const text = await response.text();
